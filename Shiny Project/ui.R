@@ -9,12 +9,11 @@ shinyUI(dashboardPage(
             menuItem("Graph", tabName = "graph", icon = icon("bar-chart")),
             menuItem("Data", tabName = "data", icon = icon("database"))
         ),
-        selectizeInput("selected",
-                       "Select Item to Display",
-                       choice),
-        dateRangeInput("dateApplied", "Select Range for 'Date Application Received'", start = "2000-12-21", end = "2017-08-31", min = "2000-12-21", max = "2017-08-31", format = "yyyy-mm-dd", startview = "month", weekstart = 0, language = "en", separator = " to "),
-        dateRangeInput("dateCompleted", "Select Range for 'Date Completed'", start = "2000-12-21", end = "2017-08-31", min = "2000-12-21", max = "2017-08-31", format = "yyyy-mm-dd", startview = "month", weekstart = 0, language = "en", separator = " to ")
-        
+        selectizeInput("selected", "Select Item to Display", choice),
+        dateRangeInput("dateApplied", "Select Range for 'Date.Application.Received'", start = "2000-12-21", end = "2017-08-31", min = "2000-12-21", max = "2017-08-31", format = "yyyy-mm-dd", startview = "month", weekstart = 0, language = "en", separator = " to "),
+        dateRangeInput("dateCompleted", "Select Range for 'Date.Completed'", start = "2000-12-21", end = "2017-08-31", min = "2000-12-21", max = "2017-08-31", format = "yyyy-mm-dd", startview = "month", weekstart = 0, language = "en", separator = " to "),
+        checkboxGroupInput("completedPipeline", "Display Completed Projects, Projects in Pipeline, or Both?", 
+                           choices = list("Completed" = 1, "Pipeline" = 2), selected = c(1,2))
     ),
     dashboardBody(
         #tags$head(

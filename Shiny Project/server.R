@@ -7,22 +7,32 @@
 shinyServer(function(input, output){
     
   filteredSolar <- reactive({
-    solar %>% filter(`Date Application Received` >= input$dateApplied[1] & `Date Application Received` <= input$dateApplied[2]) %>%
-      filter((`Date Completed` >= input$dateCompleted[1] & `Date Completed` <= input$dateCompleted[2]) | is.na(solar$`Date Completed`))
+    solar %>% filter(`Date.Application.Received` >= input$dateApplied[1] & `Date.Application.Received` <= input$dateApplied[2]) %>%
+      filter((`Date.Completed` >= input$dateCompleted[1] & `Date.Completed` <= input$dateCompleted[2]) | is.na(solar$`Date.Completed`))
   })
+  filteredSolar1 <- reactive({
+    if (length(input$completedPipeline) == 2) {
+      filter(filteredSolar(), `Project.Status`== 'Complete' | `Project.Status` == 'Pipeline')
+      } else if (1 %in% input$completedPipeline){
+          filter(filteredSolar(), `Project.Status`== 'Complete')
+        } else if (2 %in% input$completedPipeline){
+            filter(filteredSolar(), `Project.Status`== 'Pipeline')}
+    
+  })
+
     # show map using ggplot2
     output$map <- renderPlot({
-      counties_no_fill + geom_point(data = filteredSolar(), aes(x = Longitude, y = Latitude))
+      counties_no_fill + geom_point(data = filteredSolar1(), aes_string(x = "Longitude", y = "Latitude", color = input$selected))
       })
     
     # show histogram using googleVis
     output$hist <- renderPlot({
-      ggplot(data = filteredSolar(), aes(x = `Project Cost`, y = Incentive)) + geom_point(aes(color=`Date Application Received`))
+      ggplot(data = filteredSolar1(), aes(x = `Project Cost`, y = Incentive)) + geom_point(aes(color=Date.Application.Received))
     })
     
     # show data using DataTable
     output$table <- DT::renderDataTable({
-        datatable(filteredSolar(), rownames=FALSE) %>% 
+        datatable(filteredSolar1(), rownames=FALSE) %>% 
             formatStyle(input$selected, background="skyblue", fontWeight='bold')
     })
     

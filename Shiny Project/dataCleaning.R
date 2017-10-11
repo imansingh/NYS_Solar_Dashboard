@@ -1,7 +1,5 @@
 library(dplyr)
 library(tidyr)
-library(ggplot2)
-library(maps)
 
 solar = Solar_Electric_Programs_Reported_by_NYSERDA_Beginning_2000
 
@@ -18,7 +16,7 @@ solar$`Date Application Received` = as.Date(solar$`Date Application Received`, "
 solar$`Date Completed` = as.Date(solar$`Date Completed`, "%m/%d/%y")
 
 #removing '$' from $Incentives column name
-colnames(solar)[23] = 'Incentive'
+solar = rename(solar, Incentive = `$Incentives`)
 
 #removing '$' from values in Incentives column, and changing them to numeric
 solar$'Incentive' <- as.numeric(gsub('\\$|,', '', solar$'Incentive'))
@@ -45,15 +43,18 @@ solar = separate(solar, 'Coordinates', into = c('Latitude', 'Longitude'), sep=":
 solar$Latitude = as.numeric(solar$Latitude)
 solar$Longitude = as.numeric(solar$Longitude)
 
-#rename
+#rename all the variables with spaces
+solar = rename(solar, Reporting.Period = `Reporting Period`, Project.Number = `Project Number`, Zip.Code = `Zip Code`, Program.Type = `Program Type`, Electric.Utility = `Electric Utility`)
+solar = rename(solar, Purchase.Type = `Purchase Type`, Date.Application.Received = `Date Application Received`, Date.Completed = `Date Completed`, Project.Status = `Project Status`)                       
+solar = rename(solar, Total.Inverter.Quantity = `Total Inverter Quantity`, Total.PV.Module.Quantity = `Total PV Module Quantity`, Project.Cost = `Project Cost`, Total.Nameplate.kW.DC = `Total Nameplate kW DC`)               
+solar = rename(solar, Expected.KWh.Annual.Production = `Expected KWh Annual Production`)
+solar = rename(solar, Primary.Inverter.Manufacturer = `Primary Inverter Manufacturer`, Primary.PV.Module.Manufacturer = `Primary PV Module Manufacturer`)
 
-#copying database in case something goes wrong 
-solar1 = solar
+#trim columns that are not needed
+solar = select(solar, -X, -State, -Solicitation, -Primary.Inverter.Model.Number)
+solar = select(solar, -PV.Module.Model.Number, -Location, -Coordinates)
 
-solar = solar1
-
-#
-counties = map_data("county")
-nyCounties = filter(counties, region == 'new york')
-
+#add columns derived from data
+solar = mutate(solar, Days.To.Complete = Date.Completed - Date.Application.Received)
+solar = mutate(solar, Net.Cost = Project.Cost - Incentive)
 
