@@ -58,3 +58,5 @@ solar = select(solar, -PV.Module.Model.Number, -Location, -Coordinates)
 solar = mutate(solar, Days.To.Complete = Date.Completed - Date.Application.Received)
 solar = mutate(solar, Net.Cost = Project.Cost - Incentive)
 
+#removing negative and zero 'days to complete', assuming these values are meaningless for analysis
+solar$Days.To.Complete[solar$Days.To.Complete <= 0] = NA
