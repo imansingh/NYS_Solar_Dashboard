@@ -1,0 +1,3 @@
+    # exclude rsconnect directory and solar_all_variables.csv
+    /rsconnect/*
+    solar_all_variables.csv
