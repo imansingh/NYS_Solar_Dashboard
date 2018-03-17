@@ -1,0 +1,12 @@
+name: nys_solar_app
+title: NYS_Solar_App
+username:
+account: imansingh
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 300714
+bundleId: 1272239
+url: https://imansingh.shinyapps.io/nys_solar_app/
+when: 1521215562.02728
+asMultiple: FALSE
+asStatic: FALSE

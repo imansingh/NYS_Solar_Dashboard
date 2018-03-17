@@ -6,7 +6,7 @@ library(maps)
 library(shinydashboard)
 
 # import solar data and convert fields
-solar <- read.csv(file = "./solar.csv")
+solar <- read.csv(file = "solar.csv")
 solar$Reporting.Period <- as.Date(solar$Reporting.Period)
 solar$Date.Application.Received <- as.Date(solar$Date.Application.Received)
 solar$Date.Completed <- as.Date(solar$Date.Completed)

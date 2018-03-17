@@ -57,6 +57,11 @@ solar = select(solar, -PV.Module.Model.Number, -Location, -Coordinates)
 #add columns derived from data
 solar = mutate(solar, Days.To.Complete = Date.Completed - Date.Application.Received)
 solar = mutate(solar, Net.Cost = Project.Cost - Incentive)
+solar = mutate(solar, Year.Completed=format(Date.Completed, '%Y'), Year.Applied=format(Date.Application.Received, '%Y'))
+solar = mutate(solar, Incentive.Per.Annual.KW = Incentive / Expected.KWh.Annual.Production)
+solar = mutate(solar, Total.Cost.Per.Annual.KW = Project.Cost / Expected.KWh.Annual.Production)
+solar = mutate(solar, Net.Cost.Per.Annual.KW = Net.Cost / Expected.KWh.Annual.Production)
+
 
 #removing negative and zero 'days to complete', assuming these values are meaningless for analysis
 solar$Days.To.Complete[solar$Days.To.Complete <= 0] = NA

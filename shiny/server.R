@@ -5,6 +5,7 @@ shinyServer(function(input, output){
     solar %>% filter(`Date.Application.Received` >= input$dateApplied[1] & `Date.Application.Received` <= input$dateApplied[2]) %>%
       filter((`Date.Completed` >= input$dateCompleted[1] & `Date.Completed` <= input$dateCompleted[2]) | is.na(solar$`Date.Completed`))
   })
+
   
   #filter dataset based on completed and/or pipeline projects
   filteredSolar1 <- reactive({
@@ -19,7 +20,7 @@ shinyServer(function(input, output){
 
     # show map using ggplot2, with dot size, transparency and 'highlight variable' selected by user
     output$map <- renderPlot({
-      counties_no_fill + geom_point(data = filteredSolar1(), aes_string(x = "Longitude", y = "Latitude", color = input$selected), size = input$dotSize, alpha = input$transparency)
+      counties_no_fill + geom_point(data = filteredSolar1(), aes_string(x = "Longitude", y = "Latitude", color = input$selected), size = input$dotSize, alpha = input$transparency) + coord_quickmap()
       })
     
     #show histogram or bar chart using ggplot2, with plot and 'highlight' variables selected by user
