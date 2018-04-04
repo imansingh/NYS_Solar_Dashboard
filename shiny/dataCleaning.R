@@ -1,28 +1,37 @@
 library(dplyr)
 library(tidyr)
 
-solar = Solar_Electric_Programs_Reported_by_NYSERDA_Beginning_2000
+solar = read.csv('solar_raw.csv')
+
+solar = solar_raw
 
 # adding missing latitude and longitude for row 29826
-solar[29826,30] = "Three Mile Bay, NY 13693\r(44.0814, -76.1983)"
+solar[23177,30] = "Three Mile Bay, NY 13693\r(44.0814, -76.1983)"
+
+# removing parentheses from two of the 'Program Type' values
+solar$`Program Type` = gsub('\\(', '- ', solar$`Program Type`)
+solar$`Program Type` = gsub('\\)', '', solar$`Program Type`)
 
 # converting 'Reporting Period' to date object
-solar$`Reporting Period` = as.Date(solar$`Reporting Period`, "%m/%d/%y")
+solar$`Reporting Period` = as.Date(solar$`Reporting Period`, "%m/%d/%Y")
 
 # converting 'Date Appliation Received' to date object
-solar$`Date Application Received` = as.Date(solar$`Date Application Received`, "%m/%d/%y")
+solar$`Date Application Received` = as.Date(solar$`Date Application Received`, "%m/%d/%Y")
 
 # converting 'Date Completed' to date object
-solar$`Date Completed` = as.Date(solar$`Date Completed`, "%m/%d/%y")
+solar$`Date Completed` = as.Date(solar$`Date Completed`, "%m/%d/%Y")
 
 #removing '$' from $Incentives column name
-solar = rename(solar, Incentive = `$Incentives`)
+solar = rename(solar, Incentive = `$Incentive`)
 
 #removing '$' from values in Incentives column, and changing them to numeric
-solar$'Incentive' <- as.numeric(gsub('\\$|,', '', solar$'Incentive'))
+solar$'Incentive' = as.numeric(gsub('\\$|,', '', solar$'Incentive'))
 
 #removing '$' from values in Project Cost column, and changing them to numeric
-solar$'Project Cost' <- as.numeric(gsub('\\$|,', '', solar$'Project Cost'))
+solar$'Project Cost' = as.numeric(gsub('\\$|,', '', solar$'Project Cost'))
+
+#shortening 'Green.Jobs.Green.New.York.Participant' column name
+solar = rename(solar, 'Green.Jobs.Green.NY' = 'Green.Jobs.Green.New.York.Participant')
 
 #separating 'location 1' field into Location [city, state zip] and Coordinates (latitude, longitude)
 solar = separate(solar, 'Location 1', into = c('Location', 'Coordinates'), sep="\\(")
@@ -44,24 +53,54 @@ solar$Latitude = as.numeric(solar$Latitude)
 solar$Longitude = as.numeric(solar$Longitude)
 
 #rename all the variables with spaces
-solar = rename(solar, Reporting.Period = `Reporting Period`, Project.Number = `Project Number`, Zip.Code = `Zip Code`, Program.Type = `Program Type`, Electric.Utility = `Electric Utility`)
-solar = rename(solar, Purchase.Type = `Purchase Type`, Date.Application.Received = `Date Application Received`, Date.Completed = `Date Completed`, Project.Status = `Project Status`)                       
-solar = rename(solar, Total.Inverter.Quantity = `Total Inverter Quantity`, Total.PV.Module.Quantity = `Total PV Module Quantity`, Project.Cost = `Project Cost`, Total.Nameplate.kW.DC = `Total Nameplate kW DC`)               
-solar = rename(solar, Expected.KWh.Annual.Production = `Expected KWh Annual Production`)
-solar = rename(solar, Primary.Inverter.Manufacturer = `Primary Inverter Manufacturer`, Primary.PV.Module.Manufacturer = `Primary PV Module Manufacturer`)
+solar = solar %>% 
+  rename(
+    Reporting.Period = `Reporting Period`, 
+    Project.Number = `Project Number`, 
+    Zip.Code = `Zip Code`, 
+    Program.Type = `Program Type`, 
+    Electric.Utility = `Electric Utility`,
+    Purchase.Type = `Purchase Type`, 
+    Date.Application.Received = `Date Application Received`,
+    Date.Completed = `Date Completed`, 
+    Project.Status = `Project Status`,                      
+    Total.Inverter.Quantity = `Total Inverter Quantity`,
+    Primary.Inverter.Model.Number = `Primary Inverter Model Number`,
+    Total.PV.Module.Quantity = `Total PV Module Quantity`,
+    PV.Module.Model.Number = `PV Module Model Number`,
+    Project.Cost = `Project Cost`, 
+    Total.Nameplate.kW.DC = `Total Nameplate kW DC`,               
+    Expected.KWh.Annual.Production = `Expected KWh Annual Production`,
+    Primary.Inverter.Manufacturer = `Primary Inverter Manufacturer`,
+    Remote.Net.Metering = `Remote Net Metering`,
+    Affordable.Solar = `Affordable Solar`,
+    Community.Distributed.Generation = `Community Distributed Generation`,
+    Primary.PV.Module.Manufacturer = `Primary PV Module Manufacturer`,
+    Green.Jobs.Green.New.York.Participant = `Green Jobs Green New York Participant`
+    )
 
-#trim columns that are not needed
-solar = select(solar, -X, -State, -Solicitation, -Primary.Inverter.Model.Number)
-solar = select(solar, -PV.Module.Model.Number, -Location, -Coordinates)
+#remove columns that are not needed
+solar = solar %>%
+  select(-State, -Location)
 
 #add columns derived from data
-solar = mutate(solar, Days.To.Complete = Date.Completed - Date.Application.Received)
-solar = mutate(solar, Net.Cost = Project.Cost - Incentive)
-solar = mutate(solar, Year.Completed=format(Date.Completed, '%Y'), Year.Applied=format(Date.Application.Received, '%Y'))
-solar = mutate(solar, Incentive.Per.Annual.KW = Incentive / Expected.KWh.Annual.Production)
-solar = mutate(solar, Total.Cost.Per.Annual.KW = Project.Cost / Expected.KWh.Annual.Production)
-solar = mutate(solar, Net.Cost.Per.Annual.KW = Net.Cost / Expected.KWh.Annual.Production)
-
+solar = solar %>%
+  mutate(
+         Days.To.Complete = as.numeric(Date.Completed) - as.numeric(Date.Application.Received),
+         Net.Cost = Project.Cost - Incentive,
+         # Year.Completed = format(Date.Completed, '%Y'), 
+         # Year.Applied=format(Date.Application.Received, '%Y'),
+         Incentive.Per.Nameplate.kW = Incentive / Total.Nameplate.kW.DC,
+         Incentive.Per.Annual.KW = Incentive / Expected.KWh.Annual.Production,
+         Total.Cost.Per.Nameplate.kW = Project.Cost / Total.Nameplate.kW.DC,
+         Total.Cost.Per.Annual.KW = Project.Cost / Expected.KWh.Annual.Production,
+         Net.Cost.Per.Nameplate.kW = Net.Cost / Total.Nameplate.kW.DC,
+         Net.Cost.Per.Annual.KW = Net.Cost / Expected.KWh.Annual.Production)
 
 #removing negative and zero 'days to complete', assuming these values are meaningless for analysis
-solar$Days.To.Complete[solar$Days.To.Complete <= 0] = NA
+# solar$Days.To.Complete[solar$Days.To.Complete <= 0] = NA
+
+
+
+write.csv(x = solar, file = 'solar.csv')
+

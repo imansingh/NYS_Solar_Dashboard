@@ -4,12 +4,18 @@ library(shiny)
 library(DT)
 library(maps)
 library(shinydashboard)
+library(data.table)
 
 # import solar data and convert fields
-solar <- read.csv(file = "solar.csv")
+# setwd("~/Documents/GitHub/NYS_Solar_Dashboard/shiny")
+# solar <- fread(file = "solar.csv")
+
 solar$Reporting.Period <- as.Date(solar$Reporting.Period)
 solar$Date.Application.Received <- as.Date(solar$Date.Application.Received)
 solar$Date.Completed <- as.Date(solar$Date.Completed)
+solar = solar %>%
+  mutate(Days.To.Complete = Date.Completed - Date.Application.Received)
+
 
 # create variable with colnames as choice
 choice <- colnames(solar)[-1]
