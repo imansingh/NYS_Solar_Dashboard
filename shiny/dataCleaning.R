@@ -1,7 +1,8 @@
 library(dplyr)
 library(tidyr)
+library(data.table)
 
-solar = read.csv('solar_raw.csv')
+solar = fread('solar_raw.csv')
 
 solar = solar_raw
 
@@ -29,9 +30,6 @@ solar$'Incentive' = as.numeric(gsub('\\$|,', '', solar$'Incentive'))
 
 #removing '$' from values in Project Cost column, and changing them to numeric
 solar$'Project Cost' = as.numeric(gsub('\\$|,', '', solar$'Project Cost'))
-
-#shortening 'Green.Jobs.Green.New.York.Participant' column name
-solar = rename(solar, 'Green.Jobs.Green.NY' = 'Green.Jobs.Green.New.York.Participant')
 
 #separating 'location 1' field into Location [city, state zip] and Coordinates (latitude, longitude)
 solar = separate(solar, 'Location 1', into = c('Location', 'Coordinates'), sep="\\(")
@@ -76,7 +74,7 @@ solar = solar %>%
     Affordable.Solar = `Affordable Solar`,
     Community.Distributed.Generation = `Community Distributed Generation`,
     Primary.PV.Module.Manufacturer = `Primary PV Module Manufacturer`,
-    Green.Jobs.Green.New.York.Participant = `Green Jobs Green New York Participant`
+    Green.Jobs.Green.NY = `Green Jobs Green New York Participant`
     )
 
 #remove columns that are not needed

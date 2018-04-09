@@ -1,30 +1,34 @@
 shinyServer(function(input, output){
   
-#  filter dataset based on input choices ranges selected
+  #  filter dataset based on input choices ranges selected
   get_solar_filtered <- reactive({
     
     solar_filtered = solar
     
     # Days to complete, date applied, date completed
     solar_filtered = solar_filtered %>% 
-      filter(Days.To.Complete >= input$days_to_complete[1] | is.na(Days.To.Complete)) %>%
-      filter(Days.To.Complete <= input$days_to_complete[2] | is.na(Days.To.Complete)) %>%
+      filter(Days.To.Complete >= input$days_to_complete[1] | 
+               is.na(Days.To.Complete)) %>%
+      filter(Days.To.Complete <= input$days_to_complete[2] | 
+               is.na(Days.To.Complete)) %>%
       filter(Date.Application.Received >= input$date_applied[1]) %>%
       filter(Date.Application.Received <= input$date_applied[2]) %>%
-      filter(Date.Completed >= input$date_completed[1] | is.na(Date.Completed)) %>%
-      filter(Date.Completed <= input$date_completed[2] | is.na(Date.Completed))
+      filter(Date.Completed >= input$date_completed[1] | 
+               is.na(Date.Completed)) %>%
+      filter(Date.Completed <= input$date_completed[2] | 
+               is.na(Date.Completed))
 
     # Project Status
     if (length(input$project_status) != 2) {
       if (1 %in% input$project_status){
-        solar_filtered = solar_filtered %>% 
+        solar_filtered = solar_filtered %>%
           filter(Project.Status == 'Complete')
         } else if (2 %in% input$project_status){
           solar_filtered = solar_filtered %>%
             filter(Project.Status == 'Pipeline')
         } else solar_filtered = NULL
     }
-    
+
     # County
     if(!(is.null(input$counties))){
       mtx = sapply(input$counties,
@@ -32,7 +36,7 @@ shinyServer(function(input, output){
                     solar_filtered$County == str)
       solar_filtered = solar_filtered[rowSums(mtx) > 0,]
     } else solar_filtered = solar_filtered
-    
+
     # City
     if(!(is.null(input$cities))){
       mtx = sapply(input$cities,
@@ -40,7 +44,7 @@ shinyServer(function(input, output){
                      solar_filtered$City == str)
       solar_filtered = solar_filtered[rowSums(mtx) > 0,]
     } else solar_filtered = solar_filtered
-    
+
     # Zip Code
     if(!(is.null(input$zip_codes))){
       mtx = sapply(input$zip_codes,
@@ -48,7 +52,7 @@ shinyServer(function(input, output){
                      solar_filtered$Zip.Code == str)
       solar_filtered = solar_filtered[rowSums(mtx) > 0,]
     } else solar_filtered = solar_filtered
-    
+
     # Sector
     if(!(is.null(input$sector))){
       mtx = sapply(input$sector,
@@ -56,7 +60,7 @@ shinyServer(function(input, output){
                      solar_filtered$Sector == str)
       solar_filtered = solar_filtered[rowSums(mtx) > 0,]
     } else solar_filtered = NULL
-    
+
     # Program Type
     if(!(is.null(input$program_type))){
       mtx = sapply(input$program_type,
@@ -72,39 +76,35 @@ shinyServer(function(input, output){
                            solar_filtered$Solicitation == str)
       solar_filtered = solar_filtered[rowSums(mtx) > 0,]
     } else solar_filtered = solar_filtered
-    
+
     # Purchase Type
     if(!(is.null(input$purchase_type))){
       mtx = sapply(input$purchase_type,
-                   function(str)
-                           solar_filtered$Purchase.Type == str)
+                   function(str) solar_filtered$Purchase.Type == str)
       if('None Listed' %in% input$purchase_type){
         mtx = cbind(mtx,
-                       is.na(solar_filtered$Purchase.Type))
+                       length(solar$Purchase.Type == 0))
       }
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0, ]
     } else solar_filtered = NULL
-    
+
     # Affordable Solar
     if(!(is.null(input$affordable_solar))){
       mtx = sapply(input$affordable_solar,
-                   function(str)
-                     solar_filtered$Affordable.Solar == str)
+                   function(str) solar_filtered$Affordable.Solar == str)
       solar_filtered = solar_filtered[rowSums(mtx) > 0,]
     } else solar_filtered = NULL
-    
+
     # Green Jobs Green NY
     if(!(is.null(input$green_jobs))){
       mtx = sapply(input$green_jobs,
-                   function(str)
-                           solar_filtered$Green.Jobs.Green.NY == str)
+                   function(str) solar_filtered$Green.Jobs.Green.NY == str)
       if('None Listed' %in% input$green_jobs){
-        mtx = cbind(mtx,
-                       is.na(solar_filtered$Green.Jobs.Green.NY))
+        mtx = cbind(mtx, length(solar_filtered$Green.Jobs.Green.NY == 0))
       }
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else solar_filtered = NULL
-    
+
     # Contractor
     if((!is.null(input$contractor)) & input$contractor_missing){
       mtx = sapply(input$contractor,
@@ -122,7 +122,7 @@ shinyServer(function(input, output){
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
-    
+
     # Electric Utility
     if(!(is.null(input$utility))){
       mtx = sapply(input$utility,
@@ -137,12 +137,11 @@ shinyServer(function(input, output){
                    function(str)
                      solar_filtered$Remote.Net.Metering == str)
       if('None Listed' %in% input$remote_net_metering){
-        mtx = cbind(mtx,
-                    is.na(solar_filtered$Remote.Net.Metering))
+        mtx = cbind(mtx, length(solar_filtered$Remote.Net.Metering == 0))
       }
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else solar_filtered = NULL
-    
+
     # Community Distributed Generation
     if(!(is.null(input$community_distributed_generation))){
       mtx = sapply(input$community_distributed_generation,
@@ -150,14 +149,15 @@ shinyServer(function(input, output){
                      solar_filtered$Community.Distributed.Generation == str)
       solar_filtered = solar_filtered[rowSums(mtx) > 0,]
     } else solar_filtered = NULL
-    
+
     # Primary Inverter Manufacturer
-    if((!is.null(input$inverter_manufacturer)) & 
+    if((!is.null(input$inverter_manufacturer)) &
        input$inverter_manufacturer_missing){
       mtx = sapply(input$inverter_manufacturer,
                    function(str)
                      solar_filtered$Primary.Inverter.Manufacturer == str)
-      mtx = cbind(mtx, is.na(solar_filtered$Primary.Inverter.Manufacturer))
+      mtx = cbind(mtx, 
+                  length(solar_filtered$Primary.Inverter.Manufacturer == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$inverter_manufacturer)){
       mtx = sapply(input$inverter_manufacturer,
@@ -165,18 +165,19 @@ shinyServer(function(input, output){
                      solar_filtered$Primary.Inverter.Manufacturer == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$inverter_manufacturer_missing){
-      mtx = matrix(!is.na(solar_filtered$Primary.Inverter.Manufacturer))
+      mtx = matrix(!length(solar_filtered$Primary.Inverter.Manufacturer == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
 
     # Primary Inverter Model
-    if((!is.null(input$inverter_model)) & 
+    if((!is.null(input$inverter_model)) &
        input$inverter_model_missing){
       mtx = sapply(input$inverter_model,
                    function(str)
                      solar_filtered$Primary.Inverter.Model.Number == str)
-      mtx = cbind(mtx, is.na(solar_filtered$Primary.Inverter.Model.Number))
+      mtx = cbind(mtx, 
+                  length(solar_filtered$Primary.Inverter.Model.Number == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$inverter_model)){
       mtx = sapply(input$inverter_model,
@@ -184,11 +185,11 @@ shinyServer(function(input, output){
                      solar_filtered$Primary.Inverter.Model.Number == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$inverter_model_missing){
-      mtx = matrix(!is.na(solar_filtered$Primary.Inverter.Model.Number))
+      mtx = matrix(!length(solar_filtered$Primary.Inverter.Model.Number == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
-    
+
     # Total Inverter Quantity
     if(input$inverter_quantity_missing){
       solar_filtered = solar_filtered %>%
@@ -201,14 +202,15 @@ shinyServer(function(input, output){
         filter(Total.Inverter.Quantity >= input$inverter_quantity_min) %>%
         filter(Total.Inverter.Quantity <= input$inverter_quantity_max)
     }
-    
+
     # Primary PV Module Manufacturer
-    if((!is.null(input$pv_manufacturer)) & 
+    if((!is.null(input$pv_manufacturer)) &
        input$pv_manufacturer_missing){
       mtx = sapply(input$pv_manufacturer,
                    function(str)
                      solar_filtered$Primary.PV.Module.Manufacturer == str)
-      mtx = cbind(mtx, is.na(solar_filtered$Primary.PV.Module.Manufacturer))
+      mtx = cbind(mtx, 
+                  length(solar_filtered$Primary.PV.Module.Manufacturer == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$pv_manufacturer)){
       mtx = sapply(input$pv_manufacturer,
@@ -216,18 +218,18 @@ shinyServer(function(input, output){
                      solar_filtered$Primary.PV.Module.Manufacturer == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$pv_manufacturer_missing){
-      mtx = matrix(!is.na(solar_filtered$Primary.PV.Module.Manufacturer))
+      mtx = matrix(!length(solar_filtered$Primary.PV.Module.Manufacturer == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
-    
+
     # Primary PV Module Model
-    if((!is.null(input$pv_model)) & 
+    if((!is.null(input$pv_model)) &
        input$pv_model_missing){
       mtx = sapply(input$pv_model,
                    function(str)
                      solar_filtered$PV.Module.Model.Number == str)
-      mtx = cbind(mtx, is.na(solar_filtered$PV.Module.Model.Number))
+      mtx = cbind(mtx, length(solar_filtered$PV.Module.Model.Number == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$pv_model)){
       mtx = sapply(input$pv_model,
@@ -235,11 +237,11 @@ shinyServer(function(input, output){
                      solar_filtered$PV.Module.Model.Number == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$pv_model_missing){
-      mtx = matrix(!is.na(solar_filtered$PV.Module.Model.Number))
+      mtx = matrix(!length(solar_filtered$PV.Module.Model.Number == 0))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
-    
+
     # Total PV Module Quantity
     if(input$pv_quantity_missing){
       solar_filtered = solar_filtered %>%
@@ -252,77 +254,189 @@ shinyServer(function(input, output){
         filter(Total.PV.Module.Quantity >= input$pv_quantity_min) %>%
         filter(Total.PV.Module.Quantity <= input$pv_quantity_max)
     }
-    
+
     # PV Module Wattage
     solar_filtered = solar_filtered %>%
       filter(Total.Nameplate.kW.DC >= input$pv_wattage_min) %>%
       filter(Total.Nameplate.kW.DC <= input$pv_wattage_max)
-    
+
     # Expected Annual Production
     solar_filtered = solar_filtered %>%
       filter(Expected.KWh.Annual.Production >= input$annual_kwh_min) %>%
       filter(Expected.KWh.Annual.Production <= input$annual_kwh_max)
     
-      
-      
-      
-      
-      
+    # Project Cost
+    if(input$project_cost_missing){
+      solar_filtered = solar_filtered %>%
+        filter(Project.Cost >= input$project_cost_min |
+                 is.na(Project.Cost)) %>%
+        filter(Project.Cost <= input$project_cost_max |
+                 is.na(Project.Cost))
+    } else {
+      solar_filtered = solar_filtered %>%
+        filter(Project.Cost >= input$project_cost_min) %>%
+        filter(Project.Cost <= input$project_cost_max)
+    }
+
+    # Cost per kW, Cost per annual kWh
+    solar_filtered = solar_filtered %>%
+      filter(Total.Cost.Per.Nameplate.kW >= input$cost_per_kw[1] |
+               is.na(Total.Cost.Per.Nameplate.kW)) %>%
+      filter(Total.Cost.Per.Nameplate.kW <= input$cost_per_kw[2] |
+               is.na(Total.Cost.Per.Nameplate.kW)) %>%
+      filter(Total.Cost.Per.Annual.KW >= input$cost_per_annual_kwh[1] |
+               is.na(Total.Cost.Per.Annual.KW)) %>%
+      filter(Total.Cost.Per.Annual.KW <= input$cost_per_annual_kwh[2] |
+               is.na(Total.Cost.Per.Annual.KW))
+
+    # Incentive
+    if(input$incentive_missing){
+      solar_filtered = solar_filtered %>%
+        filter(Incentive >= input$incentive_min |
+                 is.na(Incentive)) %>%
+        filter(Incentive <= input$incentive_max |
+                 is.na(Incentive))
+    } else {
+      solar_filtered = solar_filtered %>%
+        filter(Incentive >= input$incentive_min) %>%
+        filter(Incentive <= input$incentive_max)
+    }
+
+    # Incentive per kW, Incentive per annual kWh
+    solar_filtered = solar_filtered %>%
+      filter(Incentive.Per.Nameplate.kW >= input$incentive_per_kw[1] |
+               is.na(Incentive.Per.Nameplate.kW)) %>%
+      filter(Incentive.Per.Nameplate.kW <= input$incentive_per_kw[2] |
+               is.na(Incentive.Per.Nameplate.kW))  %>%
+      filter(Incentive.Per.Annual.KW >= input$incentive_per_annual_kwh[1] |
+               is.na(Incentive.Per.Annual.KW)) %>%
+      filter(Incentive.Per.Annual.KW <= input$incentive_per_annual_kwh[2] |
+               is.na(Incentive.Per.Annual.KW))
+
+    # Net Cost
+      solar_filtered = solar_filtered %>%
+        filter(Net.Cost >= input$net_cost_min |
+                 is.na(Net.Cost)) %>%
+        filter(Net.Cost <= input$net_cost_max |
+                 is.na(Net.Cost))
+
+    # Net Cost per kW, Net Cost per annual kWh
+    solar_filtered = solar_filtered %>%
+      filter(Net.Cost.Per.Nameplate.kW >= input$net_cost_per_kw[1] |
+               is.na(Net.Cost.Per.Nameplate.kW)) %>%
+      filter(Net.Cost.Per.Nameplate.kW <= input$net_cost_per_kw[2] |
+               is.na(Net.Cost.Per.Nameplate.kW)) %>%
+      filter(Net.Cost.Per.Annual.KW >= input$net_cost_per_annual_kwh[1] |
+               is.na(Net.Cost.Per.Annual.KW)) %>%
+      filter(Net.Cost.Per.Annual.KW <= input$net_cost_per_annual_kwh[2] |
+               is.na(Net.Cost.Per.Annual.KW))
     
+    })
     
+  output$cost_per_kw_slider = renderUI({
+    sliderInput(
+      'cost_per_kw',
+      'Cost Per Installed Wattage ($ / kW)',
+      min = round(min(solar$Total.Cost.Per.Nameplate.kW[
+        solar$Project.Cost >= input$project_cost_min &
+          solar$Project.Cost <= input$project_cost_max],
+        na.rm = TRUE) - .1, 2),
+      max = round(max(solar$Total.Cost.Per.Nameplate.kW[
+        solar$Project.Cost >= input$project_cost_min &
+          solar$Project.Cost <= input$project_cost_max],
+        na.rm = TRUE) + .1, 2),
+      value=c(min(solar$Total.Cost.Per.Nameplate.kW,
+                  na.rm = TRUE),
+              max(solar$Total.Cost.Per.Nameplate.kW,
+                  na.rm = TRUE)))
   })
-    
-    
-    # %>%
-  #     
-  #   print(nrow(get_filtered_solar()))
-  # })
+
+  output$cost_per_annual_kwh_slider = renderUI({
+    sliderInput(
+      'cost_per_annual_kwh',
+      'Cost Per Annual Production ($ / kWh)',
+      min = round(min(solar$Total.Cost.Per.Annual.KW[
+        solar$Project.Cost >= input$project_cost_min &
+          solar$Project.Cost <= input$project_cost_max],
+        na.rm = TRUE) - .01, 2),
+      max = round(max(solar$Total.Cost.Per.Annual.KW[
+        solar$Project.Cost >= input$project_cost_min &
+          solar$Project.Cost <= input$project_cost_max],
+        na.rm = TRUE) + 1, 2),
+      value=c(min(solar$Total.Cost.Per.Annual.KW,
+                  na.rm = TRUE),
+              max(solar$Total.Cost.Per.Annual.KW,
+                  na.rm = TRUE) + 1))
+  })
 
   
-  # #filter dataset based on completed and/or pipeline projects
-  # get_filtered_solar <- reactive({
-  #   if (length(input$project_status) == 2) {
-  #     filter(solar, Project.Status == 'Complete' | Project.Status == 'Pipeline')
-  #     } else if (1 %in% input$project_status){
-  #         filter(solar, Project.Status == 'Complete')
-  #       } else if (2 %in% input$project_status){
-  #           filter(solar, Project.Status == 'Pipeline')}
-  #   
-  # })
-
-    # show map using ggplot2, with dot size, transparency and 'highlight variable' selected by user
+    # map with dot size, transparency and 'highlight variable' selected by user
     output$map <- renderPlot({
-      counties_no_fill + geom_point(data = filteredSolar1(), aes_string(x = "Longitude", y = "Latitude", color = input$selected), size = input$dotSize, alpha = input$transparency) + coord_quickmap()
+      # map_base = 
+        counties_no_fill + 
+        geom_point(data = get_solar_filtered(), 
+                   aes_string(x = "Longitude", 
+                              y = "Latitude", 
+                              color = input$map_highlight), 
+                   size = input$map_dotsize, 
+                   alpha = input$map_transparency) + 
+        guides(colour = guide_legend(override.aes = list(size=10))) +
+        coord_quickmap()
+      
+      
+      # if(input$map_highlight %in% categorial_small){
+      #   counties_no_fill + 
+      #     geom_point(data = get_solar_filtered(), 
+      #                aes_string(x = "Longitude", 
+      #                           y = "Latitude", 
+      #                           color = input$map_highlight), 
+      #                size = input$map_dotsize, 
+      #                alpha = input$map_transparency) + 
+      #     guides(colour = guide_legend(override.aes = list(size=10))) +
+      #     scale_fill_brewer(palette = 'YlOrRd') +
+      #     coord_quickmap()
+      # }
+      
       })
     
     #show histogram or bar chart using ggplot2, with plot and 'highlight' variables selected by user
     output$histogram <- renderPlot({
       if (input$selectedH %in% bar_plot_variables){
-        ggplot(data = filteredSolar1(), aes_string(x = input$selectedH)) + geom_bar(aes_string(fill=input$selected))
+        ggplot(data = get_solar_filtered(), aes_string(x = input$selectedH)) + geom_bar(aes_string(fill=input$selected))
       } else {
-        ggplot(data = filteredSolar1(), aes_string(x = input$selectedH)) + geom_histogram(aes_string(fill=input$selected))
+        ggplot(data = get_solar_filtered(), aes_string(x = input$selectedH)) + geom_histogram(aes_string(fill=input$selected))
       }
     })
     # show scatterplot using ggplot2, with x, y, and 'highlight' variables selected by user
     output$scatterplot <- renderPlot({
       if (input$regression == 1){
-      ggplot(data = filteredSolar1(), aes_string(x = input$selectedX , y = input$selectedY)) + geom_point(aes_string(color=input$selected)) + geom_smooth(color = 'red')
+      ggplot(data = get_solar_filtered(), aes_string(x = input$selectedX , y = input$selectedY)) + geom_point(aes_string(color=input$selected)) + geom_smooth(color = 'red')
       } else {
-      ggplot(data = filteredSolar1(), aes_string(x = input$selectedX , y = input$selectedY)) + geom_point(aes_string(color=input$selected))
+      ggplot(data = get_solar_filtered(), aes_string(x = input$selectedX , y = input$selectedY)) + geom_point(aes_string(color=input$selected))
       }
     })
     #show boxplot using ggplot2, with plot and 'highlight' variables selected by user
     output$boxplot <- renderPlot({
-        ggplot(data = filteredSolar1(), aes_string(x = input$selectedB, y = input$selected)) + geom_boxplot()
+        ggplot(data = get_solar_filtered(), aes_string(x = input$selectedB, y = input$selected)) + geom_boxplot()
     }) 
     # show data using DataTable
-    output$table <- DT::renderDataTable({
-        datatable(get_solar_filtered()[-1], 
-                  rownames=FALSE,
-                  options = list(scrollX = TRUE, 
-                                 scrollY = TRUE, 
-                                 autoWidth = TRUE)) # %>%
+    output$filtered_table <- DT::renderDataTable({
+      req(input$project_status)
+      datatable(get_solar_filtered()[-1],
+                rownames=FALSE,
+                options = list(scrollX = TRUE,
+                               scrollY = TRUE,
+                               autoWidth = TRUE)) # %>%
         # formatStyle(input$selected, background="skyblue", fontWeight='bold')
+    })
+    
+    output$full_table <- DT::renderDataTable({
+      datatable(solar[-1],
+                rownames=FALSE,
+                options = list(scrollX = TRUE,
+                               scrollY = TRUE,
+                               autoWidth = TRUE)) # %>%
+      # formatStyle(input$selected, background="skyblue", fontWeight='bold')
     })
     
     # show statistics using infoBox
