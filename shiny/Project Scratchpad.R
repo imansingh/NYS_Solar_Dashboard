@@ -177,3 +177,8 @@ ggplot(diamonds, aes(cut, price)) +
 bar_plot_variables = c("Sector", "Program.Type", "Electric.Utility", "Purchase.Type", "Project.Status", "Remote.Net.Metering", "Affordable.Solar", "Community.Distributed.Generation", "Green.Jobs.Green.New.York.Participant", "County", "Contractor")                
 
 summary(solar)
+
+solar_by_county = solar %>%
+  group_by(County)
+
+solar_by_county_

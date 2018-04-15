@@ -83,7 +83,7 @@ shinyServer(function(input, output){
                    function(str) solar_filtered$Purchase.Type == str)
       if('None Listed' %in% input$purchase_type){
         mtx = cbind(mtx,
-                       length(solar$Purchase.Type == 0))
+                       is.na(solar$Purchase.Type))
       }
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0, ]
     } else solar_filtered = NULL
@@ -100,7 +100,7 @@ shinyServer(function(input, output){
       mtx = sapply(input$green_jobs,
                    function(str) solar_filtered$Green.Jobs.Green.NY == str)
       if('None Listed' %in% input$green_jobs){
-        mtx = cbind(mtx, length(solar_filtered$Green.Jobs.Green.NY == 0))
+        mtx = cbind(mtx, is.na(solar_filtered$Green.Jobs.Green.NY))
       }
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else solar_filtered = NULL
@@ -137,7 +137,7 @@ shinyServer(function(input, output){
                    function(str)
                      solar_filtered$Remote.Net.Metering == str)
       if('None Listed' %in% input$remote_net_metering){
-        mtx = cbind(mtx, length(solar_filtered$Remote.Net.Metering == 0))
+        mtx = cbind(mtx, is.na(solar_filtered$Remote.Net.Metering))
       }
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else solar_filtered = NULL
@@ -157,7 +157,7 @@ shinyServer(function(input, output){
                    function(str)
                      solar_filtered$Primary.Inverter.Manufacturer == str)
       mtx = cbind(mtx, 
-                  length(solar_filtered$Primary.Inverter.Manufacturer == 0))
+                  is.na(solar_filtered$Primary.Inverter.Manufacturer))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$inverter_manufacturer)){
       mtx = sapply(input$inverter_manufacturer,
@@ -165,7 +165,7 @@ shinyServer(function(input, output){
                      solar_filtered$Primary.Inverter.Manufacturer == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$inverter_manufacturer_missing){
-      mtx = matrix(!length(solar_filtered$Primary.Inverter.Manufacturer == 0))
+      mtx = matrix(!is.na(solar_filtered$Primary.Inverter.Manufacturer))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
@@ -177,7 +177,7 @@ shinyServer(function(input, output){
                    function(str)
                      solar_filtered$Primary.Inverter.Model.Number == str)
       mtx = cbind(mtx, 
-                  length(solar_filtered$Primary.Inverter.Model.Number == 0))
+                  is.na(solar_filtered$Primary.Inverter.Model.Number))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$inverter_model)){
       mtx = sapply(input$inverter_model,
@@ -185,7 +185,7 @@ shinyServer(function(input, output){
                      solar_filtered$Primary.Inverter.Model.Number == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$inverter_model_missing){
-      mtx = matrix(!length(solar_filtered$Primary.Inverter.Model.Number == 0))
+      mtx = matrix(!is.na(solar_filtered$Primary.Inverter.Model.Number))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
@@ -210,7 +210,7 @@ shinyServer(function(input, output){
                    function(str)
                      solar_filtered$Primary.PV.Module.Manufacturer == str)
       mtx = cbind(mtx, 
-                  length(solar_filtered$Primary.PV.Module.Manufacturer == 0))
+                  is.na(solar_filtered$Primary.PV.Module.Manufacturer))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$pv_manufacturer)){
       mtx = sapply(input$pv_manufacturer,
@@ -218,7 +218,7 @@ shinyServer(function(input, output){
                      solar_filtered$Primary.PV.Module.Manufacturer == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$pv_manufacturer_missing){
-      mtx = matrix(!length(solar_filtered$Primary.PV.Module.Manufacturer == 0))
+      mtx = matrix(!is.na(solar_filtered$Primary.PV.Module.Manufacturer))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
@@ -229,7 +229,7 @@ shinyServer(function(input, output){
       mtx = sapply(input$pv_model,
                    function(str)
                      solar_filtered$PV.Module.Model.Number == str)
-      mtx = cbind(mtx, length(solar_filtered$PV.Module.Model.Number == 0))
+      mtx = cbind(mtx, is.na(solar_filtered$PV.Module.Model.Number))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!is.null(input$pv_model)){
       mtx = sapply(input$pv_model,
@@ -237,7 +237,7 @@ shinyServer(function(input, output){
                      solar_filtered$PV.Module.Model.Number == str)
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     } else if(!input$pv_model_missing){
-      mtx = matrix(!length(solar_filtered$PV.Module.Model.Number == 0))
+      mtx = matrix(!is.na(solar_filtered$PV.Module.Model.Number))
       solar_filtered = solar_filtered[rowSums(mtx, na.rm = TRUE) > 0,]
     }
     else solar_filtered = solar_filtered
@@ -306,7 +306,7 @@ shinyServer(function(input, output){
     solar_filtered = solar_filtered %>%
       filter(Incentive.Per.Nameplate.kW >= input$incentive_per_kw[1] |
                is.na(Incentive.Per.Nameplate.kW)) %>%
-      filter(Incentive.Per.Nameplate.kW <= input$incentive_per_kw[2] |
+      filter(Incentive.Per.Nameplate.kW <= input$incentive_per_kw[2] + .5 |
                is.na(Incentive.Per.Nameplate.kW))  %>%
       filter(Incentive.Per.Annual.KW >= input$incentive_per_annual_kwh[1] |
                is.na(Incentive.Per.Annual.KW)) %>%
@@ -372,16 +372,68 @@ shinyServer(function(input, output){
   
     # map with dot size, transparency and 'highlight variable' selected by user
     output$map <- renderPlot({
-      # map_base = 
-        counties_no_fill + 
-        geom_point(data = get_solar_filtered(), 
-                   aes_string(x = "Longitude", 
-                              y = "Latitude", 
-                              color = input$map_highlight), 
-                   size = input$map_dotsize, 
-                   alpha = input$map_transparency) + 
-        guides(colour = guide_legend(override.aes = list(size=10))) +
-        coord_quickmap()
+      map_base = 
+        ny_counties_map_unfilled +
+        guides(color = guide_legend(override.aes = list(size = 10)),
+               shape = guide_legend(override.aes = list(size = 10))) +
+        # geom_polygon(data = get_solar_filtered(),
+        #              aes_string()) +
+        scale_fill_gradient(low = 'blue',
+                            # mid = 'yellow',
+                            high = 'red',
+                            trans = "log10",
+                            labels = 'comma')
+
+        
+         
+      
+      if(input$map_color_highlight != 'None' & 
+         input$map_shape_highlight != 'None')  {
+        map_base = map_base +
+          geom_point(data = get_solar_filtered(), 
+                     aes_string(x = 'Longitude', 
+                                y = 'Latitude', 
+                                color = input$map_color_highlight,
+                                shape = input$map_shape_highlight),
+                     size = input$map_dotsize, 
+                     alpha = input$map_transparency)
+      } else if (input$map_color_highlight != 'None'){
+        map_base = map_base +
+          geom_point(data = get_solar_filtered(), 
+                     aes_string(x = 'Longitude', 
+                                y = 'Latitude', 
+                                color = input$map_color_highlight),
+                     size = input$map_dotsize, 
+                     alpha = input$map_transparency)
+      } else if (input$map_color_highlight != 'None'){
+        map_base = map_base +
+          geom_point(data = get_solar_filtered(), 
+                     aes_string(x = 'Longitude', 
+                                y = 'Latitude', 
+                                color = input$map_shape_highlight),
+                     size = input$map_dotsize, 
+                     alpha = input$map_transparency)
+      } else {
+        map_base = map_base +
+          geom_point(data = get_solar_filtered(), 
+                     aes_string(x = 'Longitude', 
+                                y = 'Latitude'),
+                     size = input$map_dotsize, 
+                     alpha = input$map_transparency)
+      }
+      
+      map_base
+
+      
+      # if(input$map_color_highlight != 'None'){
+      #   map_base + geom_point(data = get_solar_filtered(),
+      #                         aes_string(x = 'Longitude', 
+      #                                    y = 'Latitude',
+      #                                    color = input$map_color_highlight))
+      # } else map_base
+      
+      
+      # if(input$map_highlight)
       
       
       # if(input$map_highlight %in% categorial_small){
@@ -401,27 +453,104 @@ shinyServer(function(input, output){
     
     #show histogram or bar chart using ggplot2, with plot and 'highlight' variables selected by user
     output$histogram <- renderPlot({
-      if (input$selectedH %in% bar_plot_variables){
-        ggplot(data = get_solar_filtered(), aes_string(x = input$selectedH)) + geom_bar(aes_string(fill=input$selected))
+      if(input$histogram_highlight != 'None'){
+        if (input$histogram_selected %in% 
+            c(categorial_small, categorical_medium)){
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$histogram_selected)) + 
+            geom_bar(aes_string(# color = 'black',
+                                fill=input$histogram_highlight))
+                                # position = position_dodge()))
+        } else {
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$histogram_selected)) + 
+            geom_histogram(aes_string(fill=input$histogram_highlight))
+        }
       } else {
-        ggplot(data = get_solar_filtered(), aes_string(x = input$selectedH)) + geom_histogram(aes_string(fill=input$selected))
+        if (input$histogram_selected %in% 
+            c(categorial_small, categorical_medium)){
+          ggplot(data = get_solar_filtered()) + 
+                 # aes_string(x = input$histogram_selected)) + 
+            geom_bar(aes_string(x = input$histogram_selected))
+        } else {
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$histogram_selected)) + 
+            geom_histogram()
+        }
       }
+      
+      
     })
     # show scatterplot using ggplot2, with x, y, and 'highlight' variables selected by user
     output$scatterplot <- renderPlot({
-      if (input$regression == 1){
-      ggplot(data = get_solar_filtered(), aes_string(x = input$selectedX , y = input$selectedY)) + geom_point(aes_string(color=input$selected)) + geom_smooth(color = 'red')
+      if(input$scatter_color_highlight != 'None' & 
+         input$scatter_shape_highlight != 'None'){
+        if (input$regression == 1){
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point(aes_string(color = input$scatter_color_highlight,
+                                  shape = input$scatter_shape_highlight)) + 
+            geom_smooth(color = 'red')
+        } else {
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point(aes_string(color = input$scatter_color_highlight,
+                                  shape = input$scatter_shape_highlight))
+        }
+      } else if(input$scatter_color_highlight != 'None'){
+        if (input$regression == 1){
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point(aes_string(color = input$scatter_color_highlight)) + 
+            geom_smooth(color = 'red')
+        } else {
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point(aes_string(color=input$scatter_color_highlight))
+        }
+      } else if(input$scatter_shape_highlight != 'None'){
+        if (input$regression == 1){
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point(aes_string(shape = input$scatter_shape_highlight)) + 
+            geom_smooth(color = 'red')
+        } else {
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point(aes_string(shape = input$scatter_shape_highlight))
+        }
       } else {
-      ggplot(data = get_solar_filtered(), aes_string(x = input$selectedX , y = input$selectedY)) + geom_point(aes_string(color=input$selected))
-      }
+        if (input$regression == 1){
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point() + 
+            geom_smooth(color = 'red')
+        } else {
+          ggplot(data = get_solar_filtered(), 
+                 aes_string(x = input$selectedX , 
+                            y = input$selectedY)) + 
+            geom_point()
+        }
+      } 
+      
     })
     #show boxplot using ggplot2, with plot and 'highlight' variables selected by user
     output$boxplot <- renderPlot({
-        ggplot(data = get_solar_filtered(), aes_string(x = input$selectedB, y = input$selected)) + geom_boxplot()
+        ggplot(data = get_solar_filtered(), 
+               aes_string(x = input$selectedB, 
+                          y = input$selected)) + 
+        geom_boxplot()
     }) 
     # show data using DataTable
     output$filtered_table <- DT::renderDataTable({
-      req(input$project_status)
+      req(input$cost_per_kw)
       datatable(get_solar_filtered()[-1],
                 rownames=FALSE,
                 options = list(scrollX = TRUE,
