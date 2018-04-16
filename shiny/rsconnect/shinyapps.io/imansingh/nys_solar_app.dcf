@@ -5,9 +5,9 @@ account: imansingh
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 300714
-bundleId: 1319727
+bundleId: 1319749
 url: https://imansingh.shinyapps.io/nys_solar_app/
-when: 1523817506.27688
+when: 1523819280.7081
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: dataCleaning.R|Project Scratchpad.R|solar_raw.csv|test/global.R|test/server.R|test/solar.csv|test/ui.R|www/.DS_Store|www/custom.css|www/NYSun-stacked.jpg|www/nysun-wide.png

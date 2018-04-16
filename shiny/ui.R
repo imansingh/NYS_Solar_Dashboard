@@ -6,9 +6,9 @@ shinyUI(dashboardPage(
     h4(HTML('&emsp;'), 'NY-Sun Incentive Program'),
     p(HTML('&emsp;'), 'Solar Projects Funded, 2000-2017'),
     sidebarMenu(
-      # menuItem("App Info", 
-      #          tabName = 'info', 
-      #          icon = icon('info-circle')),
+      menuItem("App Info",
+               tabName = 'info',
+               icon = icon('info-circle')),
       menuItem('Project Criteria', 
                tabName = 'criteria', 
                icon = icon('filter')),
@@ -19,15 +19,15 @@ shinyUI(dashboardPage(
                            tabName = "map", 
                            icon = icon("map")),
                menuSubItem("Histogram/Bar Chart", 
-                        tabName = "histogram", 
-                        icon = icon("bar-chart")),
+                           tabName = "histogram", 
+                           icon = icon("bar-chart")),
                menuSubItem("Scatterplot", 
-                        tabName = "scatterplot", 
-                        icon = 
-                          icon("line-chart")),
+                           tabName = "scatterplot", 
+                           icon = 
+                             icon("line-chart")),
                menuSubItem("Boxplot", 
-                        tabName = "boxplot", 
-                        icon = icon("television"))),
+                           tabName = "boxplot", 
+                           icon = icon("television"))),
       menuItem("Full Dataset",
                tabName = "data",
                icon = icon("database"))),
@@ -41,15 +41,34 @@ shinyUI(dashboardPage(
       menuItem('LinkedIn', icon = icon('linkedin-square'), 
                href = 'https://www.linkedin.com/in/imansingh/'),
       menuItem('GitHub', icon = icon('github'), 
-               href = 'https://github.com/imansingh/Scraping-Project'))
-    ),
+               href = 'https://github.com/imansingh/Scraping-Project'))),
   dashboardBody(
     tabItems(
-      # tabItem(tabName = 'info', 
-      #         p('info on how to use the app')),
+      tabItem(
+        tabName = 'info',
+        HTML('<center><h2>
+           Solar Projects Supported by NY-SUN Incentive Program
+           </h2>
+           <h3>12/21/2000 - 2/28/2018
+           </h3> <br> </center> <h4>
+           An App for Filtering and Visualizing the Data:
+           </h4> <br>
+           <ol>
+           <li>Use "Project Criteria" sidebar item to filter projects,
+           keeping only the ones you want to visualize. As you make
+           selections in the four input panels, the output table
+           will update. </li>
+           <br>
+           <li>Use "Visualize Selected Projects" sidebar item to visualize
+           the data. Users can select which variables to visualize and
+           highlight, and customize the visualization
+           </li> </ol> <br> <br>
+           Data for this app were downloaded from
+           <a href="https://data.ny.gov/Energy-Environment/Solar-Electric-Programs-Reported-by-NYSERDA-Beginn/3x8r-34rs/data">
+           Open Data NY</a>')),
       tabItem(
         tabName = 'criteria',
-        h2('Filter Which Projects to Visualize and Analyze'),
+        h2('Filter Which Projects to Visualize'),
         fluidRow(style = 'padding:15px',
                  h3('Enter project criteria using the four input tabs'),
                  h4('The table below will update based on your choices')),
@@ -107,7 +126,7 @@ shinyUI(dashboardPage(
                                  weekstart = 0,
                                  language = "en",
                                  separator = " to "))
-              ),
+            ),
             fluidRow(
               box(width = 4,
                   selectizeInput(
@@ -147,8 +166,8 @@ shinyUI(dashboardPage(
                     multiple = TRUE,
                     options = list(placeholder =
                                      '(choose one or more)')))
-              )
-            ),
+            )
+          ),
           tabPanel('Customer and Application',
                    h4('Only include projects with these customer and 
                               application attributes:'),
@@ -206,7 +225,7 @@ shinyUI(dashboardPage(
                                         'Non-Residential',
                                         'None Listed')))
                    )
-            ),
+          ),
           tabPanel(
             'Contractor, Utility and Hardware',
             h4('Only include projects with these contractor, utility
@@ -251,7 +270,7 @@ shinyUI(dashboardPage(
                                    'No'),
                     selected = c('Yes',
                                  'No')))
-              ),
+            ),
             fluidRow(
               box(width = 3,
                   selectizeInput(
@@ -313,7 +332,7 @@ shinyUI(dashboardPage(
                                 'Include projects with no
                                         inverter quantity listed',
                                 value = TRUE))
-              ),
+            ),
             fluidRow(
               box(width = 3,
                   selectizeInput(
@@ -372,7 +391,7 @@ shinyUI(dashboardPage(
                                 'Include projects with no
                                         PV module quantity listed',
                                 value = TRUE))
-              ),
+            ),
             fluidRow(
               box(width = 6,
                   HTML('<strong>PV Module Wattage (kW): </strong>
@@ -416,8 +435,8 @@ shinyUI(dashboardPage(
                                 max = max(solar$Expected.KWh.Annual.Production),
                                 step = 1,
                                 value = max(solar$Expected.KWh.Annual.Production))))
-              )
-            ),
+            )
+          ),
           tabPanel(
             'Cost and Incentive',
             h4('Only include projects with these cost and incentive 
@@ -458,7 +477,7 @@ shinyUI(dashboardPage(
                   uiOutput('cost_per_kw_slider')),
               box(width = 3,
                   uiOutput('cost_per_annual_kwh_slider'))
-              ),
+            ),
             fluidRow(
               box(width = 6,
                   HTML('<strong>Incentive ($): </strong>
@@ -515,7 +534,7 @@ shinyUI(dashboardPage(
                                 na.rm = TRUE),
                             max(solar$Incentive.Per.Annual.KW,
                                 na.rm = TRUE))))
-              ),
+            ),
             fluidRow(
               box(width = 6,
                   HTML('<strong>Net Cost ($): </strong>
@@ -567,12 +586,8 @@ shinyUI(dashboardPage(
                     value=c(min(solar$Net.Cost.Per.Annual.KW,
                                 na.rm = TRUE),
                             max(solar$Net.Cost.Per.Annual.KW,
-                                na.rm = TRUE))))
-              )
-            )
-          )),
-        fluidRow(box(DT::dataTableOutput("filtered_table"), width = 12))
-        ),
+                                na.rm = TRUE)))))))),
+        fluidRow(box(DT::dataTableOutput("filtered_table"), width = 12))),
       tabItem(tabName = "map", 
               fluidRow(
                 column(width = 9,
@@ -589,30 +604,28 @@ shinyUI(dashboardPage(
                                           boolean,
                                           quantitative,
                                           time)),
-                          selectizeInput("map_shape_highlight", 
-                                         "Select Shape Variable", 
-                                         c('None',
-                                           categorial_small,
-                                           categorical_medium,
-                                           boolean)),
+                         selectizeInput("map_shape_highlight", 
+                                        "Select Shape Variable", 
+                                        c('None',
+                                          categorial_small,
+                                          categorical_medium,
+                                          boolean)),
                          width = NULL),
                        box(
                          h4("Customize Visualization"),
-                          sliderInput("map_dotsize", 
+                         sliderInput("map_dotsize", 
                                      "Select Dot Size", 
                                      min = .1, 
                                      max = 3, 
                                      value = 1, 
                                      ticks = FALSE), 
-                          sliderInput("map_transparency",
-                                      "Select Transparency", 
-                                      min = .01, 
-                                      max = 1, 
-                                      value = .5, 
-                                      ticks = FALSE),
-                          width = NULL))
-                )
-              ),
+                         sliderInput("map_transparency",
+                                     "Select Transparency", 
+                                     min = .01, 
+                                     max = 1, 
+                                     value = .5, 
+                                     ticks = FALSE),
+                         width = NULL)))),
       tabItem(tabName = "histogram", 
               h2("Histogram or Bar Chart of Projects Meeting Your Criteria"),
               fluidRow(box(plotOutput("histogram"), width = NULL)),
@@ -622,7 +635,6 @@ shinyUI(dashboardPage(
                                    "Select Variable to Plot", 
                                    c(categorial_small,
                                      categorical_medium,
-                                     categorical_large,
                                      boolean,
                                      quantitative,
                                      time))),
@@ -632,62 +644,96 @@ shinyUI(dashboardPage(
                                    c("None",
                                      categorial_small,
                                      categorical_medium,
-                                     categorical_large,
                                      boolean))))),
-                # box(width = 4,
-                #     radioButtons('stack_or_dodge',
-                #                  'Stack or "Dodge" Higlighted Variable?',
-                #                  choices = list("Stack" = 1, 
-                #                                 "Dodge" = 2), 
-                #                  selected = 2)))),
+      # box(width = 4,
+      #     radioButtons('stack_or_dodge',
+      #                  'Stack or "Dodge" Higlighted Variable?',
+      #                  choices = list("Stack" = 1, 
+      #                                 "Dodge" = 2), 
+      #                  selected = 2)))),
       tabItem(tabName = "scatterplot", 
               h2("Scatterplot of Projects Meeting Your Criteria"),
-              fluidRow(box(plotOutput("scatterplot"), width = 12)),
-              fluidRow(box(selectizeInput("selectedX", 
-                                          "Select X Variable", 
-                                          c(quantitative,
-                                            time), 
-                                          selected = 10), 
-                           width = 4),
-                       box(selectizeInput("selectedY", 
-                                          "Select Y Variable", 
-                                          c(quantitative,
-                                            time), 
-                                          selected = 7), 
-                           width = 4),
-                       box(radioButtons("regression", 
-                                        "Add Regression Line?", 
-                                        choices = list("Yes" = 1, "No" = 2), 
-                                        selected = 2), 
-                           width = 4)),
-              fluidRow(box(
-                h4("Select Highight Variables"),
-                column(width = 6,
-                       selectizeInput("scatter_color_highlight", 
-                                      "Select Color Variable", 
-                                      c('None',
-                                        categorial_small,
-                                        categorical_medium,
-                                        boolean,
-                                        quantitative,
-                                        time))),
-                column(width = 6,
-                       selectizeInput("scatter_shape_highlight", 
-                                      "Select Shape Variable", 
-                                      c('None',
-                                        categorial_small,
-                                        categorical_medium,
-                                        boolean))),
-                width = 12))),
-      tabItem(tabName = "boxplot", 
+              fluidRow(
+                box(width = 12,
+                    plotOutput("scatterplot"))),
+              fluidRow(
+                box(width = 4,
+                    selectizeInput("scatter_x", 
+                                   "Select X Variable", 
+                                   c(time,
+                                     quantitative), 
+                                   selected = 10)),
+                box(width = 4,
+                    selectizeInput("scatter_y", 
+                                   "Select Y Variable", 
+                                   c(quantitative,
+                                     time), 
+                                   selected = 7)),
+                box(width = 4,
+                    radioButtons("regression", 
+                                 "Add Regression Line?", 
+                                 choices = list("Yes" = 1, 
+                                                "No" = 2), 
+                                 selected = 2))),
+              fluidRow(
+                box(width = 6,
+                    h4("Select Highight Variables"),
+                    column(width = 6,
+                           selectizeInput("scatter_color_highlight", 
+                                          "Select Color Variable", 
+                                          c('None',
+                                            categorial_small,
+                                            categorical_medium,
+                                            boolean,
+                                            quantitative,
+                                            time))),
+                    column(width = 6,
+                           selectizeInput("scatter_shape_highlight", 
+                                          "Select Shape Variable", 
+                                          c('None',
+                                            categorial_small,
+                                            categorical_medium,
+                                            boolean)))),
+                box(width = 6,
+                    h4("Customize Visualization"),
+                    column(width = 6,
+                           sliderInput("scatter_dotsize", 
+                                       "Select Dot Size", 
+                                       min = .1, 
+                                       max = 3, 
+                                       value = 1, 
+                                       ticks = FALSE)),
+                    column(width = 6,
+                           sliderInput("scatter_transparency",
+                                       "Select Transparency", 
+                                       min = .01, 
+                                       max = 1, 
+                                       value = .5, 
+                                       ticks = FALSE))))),
+      tabItem(tabName = "boxplot",
               h2("Boxplot of Projects Meeting Your Criteria"),
-              fluidRow(box(plotOutput("boxplot"), width = 12)),
-              fluidRow(box(selectizeInput("selectedB", "Select Variable to Plot", choice)))),
+              fluidRow(
+                box(width = 12,
+                    plotOutput("boxplot"))),
+              fluidRow(
+                box(width = 6,
+                    selectizeInput("boxplot_x",
+                                   "Select X Variable",
+                                   c(categorial_small,
+                                     categorical_medium,
+                                     boolean))),
+                box(width = 6,
+                    selectizeInput("boxplot_y",
+                                   "Select Y Variable",
+                                   c(quantitative,
+                                     time))))),
       tabItem(tabName = "data", 
               h2('Solar Installations Funded by NY-Sun Incentive Program, 2000-2017'),
-              fluidRow(box(DT::dataTableOutput("full_table"), width = 12)))
-              )
+              fluidRow(
+                box(width = 12,
+                    DT::dataTableOutput("full_table"))))
     )
+  )
 ))
 
 #fluidRow(infoBoxOutput("maxBox"),

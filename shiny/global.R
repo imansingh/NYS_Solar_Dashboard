@@ -6,6 +6,7 @@ library(DT)
 library(maps)
 library(shinydashboard)
 library(data.table)
+library(mgcv)
 
 # import solar data and convert fields
 # setwd("~/Docuunments/GitHub/NYS_Solar_Dashboard/shiny")
@@ -41,7 +42,7 @@ quantitative =
     "Net.Cost.Per.Nameplate.kW", "Net.Cost.Per.Annual.KW")
 
 time = 
-  c("Reporting.Period", "Date.Application.Received", "Date.Completed", 
+  c("Date.Application.Received", "Date.Completed", 
     "Days.To.Complete")
 
 boolean = 

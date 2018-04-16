@@ -487,67 +487,99 @@ shinyServer(function(input, output){
          input$scatter_shape_highlight != 'None'){
         if (input$regression == 1){
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
             geom_point(aes_string(color = input$scatter_color_highlight,
-                                  shape = input$scatter_shape_highlight)) + 
-            geom_smooth(color = 'red')
+                                  shape = input$scatter_shape_highlight),
+                       size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) + 
+            geom_smooth(color = 'red', na.rm = TRUE) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         } else {
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
             geom_point(aes_string(color = input$scatter_color_highlight,
-                                  shape = input$scatter_shape_highlight))
+                                  shape = input$scatter_shape_highlight),
+                       size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         }
       } else if(input$scatter_color_highlight != 'None'){
         if (input$regression == 1){
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
-            geom_point(aes_string(color = input$scatter_color_highlight)) + 
-            geom_smooth(color = 'red')
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
+            geom_point(aes_string(color = input$scatter_color_highlight),
+                       size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) + 
+            geom_smooth(color = 'red', na.rm = TRUE) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         } else {
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
-            geom_point(aes_string(color=input$scatter_color_highlight))
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
+            geom_point(aes_string(color=input$scatter_color_highlight),
+                       size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         }
       } else if(input$scatter_shape_highlight != 'None'){
         if (input$regression == 1){
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
-            geom_point(aes_string(shape = input$scatter_shape_highlight)) + 
-            geom_smooth(color = 'red')
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
+            geom_point(aes_string(shape = input$scatter_shape_highlight),
+                       size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) + 
+            geom_smooth(color = 'red', na.rm = TRUE) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         } else {
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
-            geom_point(aes_string(shape = input$scatter_shape_highlight))
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
+            geom_point(aes_string(shape = input$scatter_shape_highlight),
+                       size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         }
       } else {
         if (input$regression == 1){
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
-            geom_point() + 
-            geom_smooth(color = 'red')
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
+            geom_point(size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) + 
+            geom_smooth(color = 'red', na.rm = TRUE) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         } else {
           ggplot(data = get_solar_filtered(), 
-                 aes_string(x = input$selectedX , 
-                            y = input$selectedY)) + 
-            geom_point()
+                 aes_string(x = input$scatter_x , 
+                            y = input$scatter_y)) + 
+            geom_point(size = input$scatter_dotsize, 
+                       alpha = input$scatter_transparency) +
+            guides(color = guide_legend(override.aes = list(size = 10)),
+                   shape = guide_legend(override.aes = list(size = 10)))
         }
       } 
       
     })
     #show boxplot using ggplot2, with plot and 'highlight' variables selected by user
     output$boxplot <- renderPlot({
-        ggplot(data = get_solar_filtered(), 
-               aes_string(x = input$selectedB, 
-                          y = input$selected)) + 
+      
+      ggplot(data = get_solar_filtered(), 
+             aes_string(x = input$boxplot_x, 
+                        y = input$boxplot_y)) +
         geom_boxplot()
     }) 
+    
     # show data using DataTable
     output$filtered_table <- DT::renderDataTable({
       req(input$cost_per_kw)
